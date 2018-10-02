@@ -1,0 +1,175 @@
+% --------------------------------------------------------------
+% This is all preamble stuff that you don't have to worry about.
+% Head down to where it says "Start here"
+% --------------------------------------------------------------
+
+%Preamble
+\documentclass[12pt]{article}
+\usepackage[margin=1in]{geometry} 
+\usepackage{amsmath,amsthm,amssymb,scrextend,mathtools}
+\usepackage{tikz}
+\usetikzlibrary{arrows}
+\usetikzlibrary{positioning}
+\usepackage{fancyhdr}
+\usepackage{forest}
+\pagestyle{fancy}
+
+%Command Declarations
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\I}{\mathbb{I}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Q}{\mathbb{Q}}
+\renewcommand{\qed}{\hfill$\blacksquare$}
+\let\newproof\proof
+\renewenvironment{proof}{\begin{addmargin}[1em]{0em}\begin{newproof}}{\end{newproof}\end{addmargin}\qed}
+
+%Environment Declarations 
+\newenvironment{theorem}[2][Theorem]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{lemma}[2][Lemma]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{problem}[2][Problem]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{exercise}[2][Exercise]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{reflection}[2][Reflection]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{proposition}[2][Proposition]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{corollary}[2][Corollary]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{definition}[2][Definition]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+ 
+\begin{document}
+ 
+% --------------------------------------------------------------
+%                         Start here
+% --------------------------------------------------------------
+
+%Header
+\lhead{CSCI 2270: Assignment 7}
+\chead{Justin Adkins}
+\rhead{March 16, 2018}
+\textbf{Question 1:} Does inserting a node into a red-black tree, re-balancing, and then deleting it result in the original tree? \\ \\
+\noindent
+We will show that inserting, rebalancing, and then deleting a node \emph{can} result in a new tree. Consider the following tree: \\
+\tikzset{
+  treenode/.style = {align=center, inner sep=0pt, text centered,
+    font=\sffamily},
+  arn_n/.style = {treenode, circle, white, font=\sffamily\bfseries, draw=black,
+    fill=black, text width=1.5em},% arbre rouge noir, noeud noir
+  arn_r/.style = {treenode, circle, red, draw=red, 
+    text width=1.5em, very thick},% arbre rouge noir, noeud rouge
+  arn_x/.style = {treenode, rectangle, draw=black, fill = black,
+    minimum width=0.5em, minimum height=0.5em}% arbre rouge noir, nil
+}
+\begin{center}
+\begin{tikzpicture}[->,>=stealth',level/.style={sibling distance = 4cm/#1,
+  level distance = 1cm}] 
+\node [arn_n] {10}
+    child{ node [arn_x] {}
+	   }
+    child{ node[arn_r] {20}
+}; 
+\end{tikzpicture}
+\end{center}
+
+\noindent
+Adding 30 to this tree will result in the following: \\
+
+\begin{center}
+\begin{tikzpicture}[->,>=stealth',level/.style={sibling distance = 4cm/#1,
+  level distance = 1cm}] 
+\node [arn_n] {10}
+    child{ node [arn_x] {}
+	   }
+    child{ node[arn_r] {20}
+            child{ node [arn_x] {} }
+    	    child{ node [arn_r] {30} }
+}; 
+\end{tikzpicture}
+\end{center}
+\noindent
+This tree is not balanced because it contains a red node with a red child. From the RBInsert Algorithm line 11, we perform a left rotate on 20 (parent of 30). This will make 20 the root, and by line 17, the root will be colored black. This results in this tree: \\
+
+\begin{center}
+\begin{tikzpicture}[->,>=stealth',level/.style={sibling distance = 4cm/#1,
+  level distance = 1cm}] 
+\node [arn_n] {20}
+    child{ node [arn_r] {10}
+	   }
+    child{ node[arn_r] {30}
+}; 
+\end{tikzpicture}
+\end{center}
+\noindent
+Now deleting 30 from the tree we are left with a tree that is different from the original:
+
+\begin{center}
+\begin{tikzpicture}[->,>=stealth',level/.style={sibling distance = 4cm/#1,
+  level distance = 1cm}] 
+\node [arn_n] {20}
+    child{ node [arn_r] {10}
+	   }
+    child{ node[arn_x] {}
+}; 
+\end{tikzpicture}
+\end{center}
+
+\textbf{Question 2:} Does deleting a node with no children from a red-black tree, re-balancing, and then re-inserting it with the same key always result in the original tree? \\
+
+\noindent
+We will show that by deleting a node with no children, re-balancing, and then re-inserting the same node can result in a different tree. Consider the following tree: \\
+
+\begin{center}
+\begin{tikzpicture}[->,>=stealth',level/.style={sibling distance = 4cm/#1,
+  level distance = 1cm}] 
+\node [arn_n] {20}
+    child{ node [arn_n] {10}
+	   }
+    child{ node[arn_n] {30}
+    	child{ node[arn_x] {}}
+    	child{ node[arn_r] {40}}
+}; 
+\end{tikzpicture}
+\end{center}
+\noindent
+Deleting 10 will result in an unbalanced tree. The RBBalance Algorithm will be called since $x$ will be a null node black child of 20. This will result in a left rotate on 20 (line 21 of RBBalance) and the re-coloring of 40 (line 20 of RBBalance). The resulting tree is: \\
+\begin{center}
+\begin{tikzpicture}[->,>=stealth',level/.style={sibling distance = 4cm/#1,
+  level distance = 1cm}] 
+\node [arn_n] {30}
+    child{ node [arn_n] {20}
+	   }
+    child{ node[arn_n] {40}
+}; 
+\end{tikzpicture}
+\end{center}
+\noindent
+Now, re-inserting the 10 node we get the following: \\
+\begin{center}
+\begin{tikzpicture}[->,>=stealth',level/.style={sibling distance = 4cm/#1,
+  level distance = 1cm}] 
+\node [arn_n] {30}
+    child{ node [arn_n] {20}
+    	child{ node [arn_r] {10}}
+    	child{ node [arn_x] {}}
+	   }
+    child{ node[arn_n] {40}
+}; 
+\end{tikzpicture}
+\end{center}
+\noindent
+This tree needs no rebalancing after insertion and is a valid Red Black Tree. Comparing it to our original tree, we can see that the two differ in several areas. Thus, proving that deleting a node with no children, re-balancing, and re-inserting the same node \emph{can} result in a different tree.
+\end{document}
+
+
+
+
+
+
+
+
+
